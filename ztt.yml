@@ -1,0 +1,8 @@
+---
+- hosts: db
+  become: yes
+  tasks:
+      - stat: path=/etc/hosts
+        register: host_info
+      - set_fact: ex_var="{{ host_info.stat.path|upper }}"
+      - debug: var=ex_var

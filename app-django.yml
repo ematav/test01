@@ -1,0 +1,25 @@
+---
+- hosts: app
+  become: yes
+  tasks:
+      - name: Install Django utils
+        yum: 
+          name: "{{ item }}" 
+          state: present
+        with_items:
+            - MySQL-python
+            - python-setuptools
+      - name: Inatall pip
+        easy_install:
+            name: pip
+            state: latest
+
+      - name: Install Django
+        command: "python -m pip install \"django<2\""
+
+
+            
+
+
+          
+          

@@ -1,0 +1,43 @@
+---
+- name: Package installation
+  yum: 
+    name: "{{ item }}" 
+    state: installed
+  with_items:
+      - nfs-utils
+      - libnfsidmap
+
+- name: Starting and enable FS services
+  service: 
+    name: "{{ item }}" 
+    state: started 
+    enabled: yes
+  with_items:
+      - rpcbind
+      - nfs-server
+
+- name: Start other NFS  services
+  service: 
+    name: "{{ item }}" 
+    state: started
+  with_items:
+      - nfs-lock
+      - nfs-idmap
+
+- name: Create a folder and share it over a network
+  file: 
+    path: "{{ nfs_mount }}" 
+    state: directory
+    mode: 777
+
+- name: Make an entry in exports file
+  lineinfile:
+      path: /etc/exports
+      state: present
+      create: yes
+      backup: yes
+      insertafter: EOF
+      line: "{{ nfs_mount }} {{ ansible_all_ipv4_addresses[1] }}(rw,sync,no_root_squash)"
+  register: nfs_result
+
+- debug: msg="{{ nfs_result.stdout }} Code erreur {{ nfs_result_stderr }}"
